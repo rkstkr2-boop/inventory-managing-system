@@ -28,7 +28,7 @@ Views.reports = function (el) {
     (canCost ? '<div class="stat ok"><small>Total profit</small><b>' + UI.inr(profit) + '</b></div>' +
                '<div class="stat"><small>Profit margin</small><b>' + (rev ? (profit / rev * 100).toFixed(1) : 0) + '%</b></div>' : '') + '</div>' +
     '<div class="card"><div class="card-h"><h3>Sales, last 7 days</h3></div><div class="bars">' +
-      days.map(d => '<div class="bar"><span>' + (d.tot ? UI.inr(d.tot) : '') + '</span><i data-h="' + Math.max(2, d.tot / max * 100) + '%"></i>' + d.label + '</div>').join('') + '</div></div>' +
+      days.map(d => '<div class="bar"><span>' + (d.tot ? UI.short(d.tot) : '') + '</span><i data-h="' + Math.max(2, d.tot / max * 100) + '%"></i>' + d.label + '</div>').join('') + '</div></div>' +
     '<div class="two-col"><div class="card"><div class="card-h"><h3>Best sellers (units)</h3></div>' + hbars(group(s => s.name, s => s.qty), v => v + ' pcs') + '</div>' +
     '<div class="card"><div class="card-h"><h3>Sales by category</h3></div>' + hbars(group(s => (CATEGORIES[s.category] || { label: 'Other' }).label, s => s.total), UI.inr) + '</div></div>' +
     '<div class="two-col"><div class="card"><div class="card-h"><h3>Payment modes</h3></div>' + hbars(group(s => s.payment, s => s.total), UI.inr) + '</div>' +

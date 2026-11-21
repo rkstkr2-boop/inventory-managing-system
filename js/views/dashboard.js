@@ -57,7 +57,7 @@ Views.dashboard = function (el) {
   }
 
   h += '<div class="two-col"><div class="card"><div class="card-h"><h3>Sales - last 7 days</h3><span class="muted">' + UI.inr(sum(days, d => d.tot)) + '</span></div><div class="bars">' +
-    days.map((d, i) => '<div class="bar' + (i === 6 ? ' now' : '') + '"><span>' + (d.tot ? UI.inr(d.tot) : '') + '</span><i data-h="' + Math.max(2, d.tot / dmax * 100) + '%"></i>' + d.label + '</div>').join('') + '</div></div>' +
+    days.map((d, i) => '<div class="bar' + (i === 6 ? ' now' : '') + '"><span>' + (d.tot ? UI.short(d.tot) : '') + '</span><i data-h="' + Math.max(2, d.tot / dmax * 100) + '%"></i>' + d.label + '</div>').join('') + '</div></div>' +
     '<div class="card"><div class="card-h"><h3>Stock by category</h3></div>' + (cats.length ? cats.map(c =>
       '<div class="hbar"><span class="l">' + CATEGORIES[c.k].icon + ' ' + CATEGORIES[c.k].label + '</span><span class="t"><i data-w="' + Math.max(3, c.units / cmax * 100) + '%"></i></span><span class="v">' + c.units + ' pcs' + (c.low ? ' <span class="dot"></span>' : '') + '</span></div>').join('') : '<div class="empty">No stock yet</div>') + '</div></div>';
 

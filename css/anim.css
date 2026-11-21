@@ -141,3 +141,51 @@ tbody tr { transition: background .15s; }
 .vrow { display: flex; gap: 16px; margin: 6px 0 2px; font-size: 13.5px; }
 .vstats { grid-template-columns: repeat(3, 1fr); }
 @media (max-width: 860px) { .vstats { grid-template-columns: 1fr; } }
+
+/* ================= phone layout fixes ================= */
+@media (max-width: 860px) {
+  .app { grid-template-columns: minmax(0, 1fr); }
+  .main, #view, .card, .stat, .hero, .two-col > * { min-width: 0; }
+  #view { overflow-x: hidden; }
+  .two-col { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  .form-grid { grid-template-columns: minmax(0, 1fr); }
+  .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .stat { padding: 12px 14px; } .stat b { font-size: 19px; } .stat small { font-size: 12px; }
+  .hero-big { font-size: 38px; } .hero-act .btn { flex: 1; }
+  .hm { display: none !important; }
+  .card { padding: 14px; } .card-h h3 { font-size: 15px; }
+  .toolbar > * { flex: 1 1 100%; } .toolbar .seg, .toolbar .btn { flex: 1 1 auto; } .toolbar select { width: 100%; }
+  .hbar .l { width: 112px; font-size: 13px; } .hbar .v { width: 74px; font-size: 13px; }
+  .bars { gap: 6px; } .bar span { font-size: 10px; }
+  .alerts { grid-template-columns: minmax(0, 1fr); }
+  .remain { max-height: 360px; }
+  .pcard .actions .btn { flex: 1 1 auto; padding: 6px 4px; }
+  .pbody { padding: 10px; } .price { font-size: 15px; } .pphoto.ph { font-size: 48px; }
+  .vgrid { grid-template-columns: minmax(0, 1fr); }
+  .topbar h2 { font-size: 18px; } .topbar .user-chip b { font-size: 13px; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; }
+
+  /* bottom menu: all items share the width evenly */
+  .sidebar { padding: 4px 2px calc(4px + env(safe-area-inset-bottom)); box-shadow: 0 -6px 20px rgba(0,0,0,.2); }
+  .nav { gap: 0; justify-content: stretch; }
+  .nav a { flex: 1 1 0; min-width: 0; padding: 7px 2px; font-size: 10px; gap: 3px; border-radius: 10px; justify-content: center; line-height: 1.1; }
+  .nav a svg { width: 21px; height: 21px; }
+  .nav a:hover { transform: none; }
+  .nav a.active { box-shadow: 0 4px 12px rgba(79,70,229,.5); }
+
+  /* smaller floating Sell button, clear of the menu */
+  .fab { bottom: calc(76px + env(safe-area-inset-bottom)); right: 12px; padding: 12px 18px; font-size: 14px; }
+  #view { padding-bottom: 150px; }
+
+  /* pop-ups slide up from the bottom like a phone sheet */
+  .overlay { padding: 0; align-items: flex-end; }
+  .modal, .modal.wide { max-width: none; width: 100%; max-height: 92vh; overflow-y: auto; border-radius: 20px 20px 0 0; animation: sheetUp .35s cubic-bezier(.2,.9,.3,1); }
+  .modal-h { position: sticky; top: 0; background: #fff; z-index: 2; border-radius: 20px 20px 0 0; }
+  .modal-b { padding: 16px; padding-bottom: calc(20px + env(safe-area-inset-bottom)); }
+  .form-actions { position: sticky; bottom: -16px; background: #fff; padding: 10px 0 4px; margin-bottom: -4px; }
+  .form-actions .btn { flex: 1; }
+  .detail-top { flex-direction: column; align-items: flex-start; }
+  .summary div { gap: 12px; } .summary div b { text-align: right; }
+  #toasts { left: 12px; right: 12px; bottom: calc(140px + env(safe-area-inset-bottom)); } .toast { max-width: none; }
+  input, select, textarea { font-size: 16px; }   /* stops iPhones zooming in when typing */
+}
+@keyframes sheetUp { from { transform: translateY(100%); } to { transform: none; } }

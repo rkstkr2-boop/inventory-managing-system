@@ -87,9 +87,9 @@ const SalesView = {
       el.querySelector('#tot').innerHTML = rows.length + ' sales · <b>' + UI.inr(live.reduce((n, s) => n + s.total, 0)) + '</b> collected · ' + live.reduce((n, s) => n + s.qty, 0) + ' items sold';
       const list = el.querySelector('#list');
       if (!rows.length) { list.innerHTML = '<div class="empty">No sales in this period.</div>'; return; }
-      list.innerHTML = '<table><thead><tr><th>Receipt</th><th>Product</th><th class="num">Qty</th><th class="num">Total</th><th>Payment</th><th>Customer</th><th>Sold by</th><th></th></tr></thead><tbody>' +
+      list.innerHTML = '<table><thead><tr><th>Receipt</th><th>Product</th><th class="num">Qty</th><th class="num">Total</th><th class="hm">Payment</th><th class="hm">Customer</th><th class="hm">Sold by</th><th></th></tr></thead><tbody>' +
         rows.map(s => '<tr class="' + (s.voided ? 'void' : '') + '"><td><b>' + s.receipt + '</b><small>' + UI.dt(s.date) + '</small></td><td>' + UI.esc(s.name) + (s.imei ? '<small>IMEI ' + UI.esc(s.imei) + '</small>' : '') + '</td>' +
-          '<td class="num">' + s.qty + '</td><td class="num"><b>' + UI.inr(s.total) + '</b></td><td>' + UI.esc(s.payment) + '</td><td>' + UI.esc(s.customer || '-') + '</td><td>' + UI.esc(s.soldBy) + '</td>' +
+          '<td class="num">' + s.qty + '</td><td class="num"><b>' + UI.inr(s.total) + '</b></td><td class="hm">' + UI.esc(s.payment) + '</td><td class="hm">' + UI.esc(s.customer || '-') + '</td><td class="hm">' + UI.esc(s.soldBy) + '</td>' +
           '<td><div class="actions"><button class="btn sm" data-a="view" data-id="' + s.id + '">Details</button>' +
           (Auth.can('sales.void') && !s.voided ? '<button class="btn sm" data-a="void" data-id="' + s.id + '">Cancel</button>' : '') +
           (s.voided ? '<span class="badge gray">Cancelled</span>' : '') + '</div></td></tr>').join('') + '</tbody></table>';

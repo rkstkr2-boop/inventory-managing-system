@@ -23,6 +23,13 @@ const Auth = {
     sessionStorage.setItem('ims_session', JSON.stringify({ id: user.id }));
     return { ok: true };
   },
+  /* one-tap sign in: enters as the first active user of the chosen role */
+  autoLogin(role) {
+    const user = Store.users().find(u => u.role === role && u.active);
+    if (!user) return { ok: false, msg: 'No active ' + ROLES[role].label + ' account. Ask the Managing Director to enable one.' };
+    sessionStorage.setItem('ims_session', JSON.stringify({ id: user.id }));
+    return { ok: true };
+  },
   current() {
     try {
       const s = JSON.parse(sessionStorage.getItem('ims_session'));

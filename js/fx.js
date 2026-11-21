@@ -57,7 +57,7 @@ const FX = {
 
   ripple() {
     document.addEventListener('click', e => {
-      const b = e.target.closest('.btn, .fab, .role');
+      const b = e.target.closest('.btn, .fab, .role, .auto-btn');
       if (!b || this.reduced) return;
       const r = b.getBoundingClientRect(), d = Math.max(r.width, r.height);
       const s = document.createElement('span');

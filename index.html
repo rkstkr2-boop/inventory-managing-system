@@ -5,48 +5,63 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Sign in - Mobile Shop Inventory</title>
   <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/login.css">
   <link rel="stylesheet" href="css/anim.css">
+  <link rel="stylesheet" href="css/login.css">
 </head>
 <body class="login-body">
-  <i class="blob" style="width:160px;height:160px;left:6%;top:12%"></i>
-  <i class="blob" style="width:90px;height:90px;right:10%;top:20%;animation-delay:-2s"></i>
-  <i class="blob" style="width:220px;height:220px;right:4%;bottom:6%;animation-delay:-4s"></i>
-  <main class="login-wrap">
+  <canvas id="bg" aria-hidden="true"></canvas>
+  <i class="blob" data-depth="30" style="width:160px;height:160px;left:6%;top:12%"></i>
+  <i class="blob" data-depth="-22" style="width:90px;height:90px;right:10%;top:20%;animation-delay:-2s"></i>
+  <i class="blob" data-depth="45" style="width:220px;height:220px;right:4%;bottom:6%;animation-delay:-4s"></i>
+
+  <main class="login-wrap" id="wrap">
     <section class="login-brand">
-      <div class="logo">📱</div>
-      <h1>Mobile Shop<br>Inventory</h1>
-      <p>Track phones, batteries, watches, covers and more. Every sale updates your stock instantly.</p>
-      <ul>
-        <li>Live stock count after every sale</li>
-        <li>Full record of who sold what, and for how much</li>
-        <li>Low-stock alerts so you never run out</li>
-      </ul>
+      <div class="brand-top"><span class="logo-s">📱</span> Shop Inventory</div>
+
+      <div class="stage" id="stage" title="Drag to spin the phone">
+        <div class="glow"></div>
+        <span class="chip c1">📦 In stock</span>
+        <span class="chip c2">⚡ Sold!</span>
+        <span class="chip c3">🔔 Restock</span>
+        <div class="phone3d" id="phone">
+          <div class="layer" style="transform:translateZ(-6px)"></div>
+          <div class="layer" style="transform:translateZ(-3px)"></div>
+          <div class="layer" style="transform:translateZ(0)"></div>
+          <div class="layer" style="transform:translateZ(3px)"></div>
+          <div class="layer" style="transform:translateZ(6px)"></div>
+          <div class="face front">
+            <div class="scr">
+              <span class="notch"></span>
+              <div class="s-top"><small>Sold today</small><b>₹64,999</b></div>
+              <div class="s-bars"><i style="--h:35%"></i><i style="--h:60%"></i><i style="--h:45%"></i><i style="--h:85%"></i><i style="--h:55%"></i></div>
+              <div class="s-pill">✓ Sale recorded</div>
+              <div class="s-alert">🔔 7 need restock</div>
+            </div>
+          </div>
+          <div class="face back"><div class="cam"><i></i><i></i><i></i></div><b>Shop<br>Inventory</b></div>
+        </div>
+      </div>
+
+      <h1>Mobile Shop <br>Inventory</h1>
+      <p class="rot" id="rot">Track every phone.</p>
+      <div class="kpis" id="kpis">
+        <div><b data-count="0" id="k1">0</b><small>Products</small></div>
+        <div><b data-count="0" id="k2">0</b><small>Units in stock</small></div>
+        <div><b data-count="0" id="k3">0</b><small>Sales recorded</small></div>
+      </div>
     </section>
 
     <section class="login-card">
-      <h2>Welcome back</h2>
-      <p class="muted">Choose your role and sign in</p>
+      <h2>Welcome back 👋</h2>
+      <p class="muted">Tap your role to enter. No password needed.</p>
 
-      <div class="roles" id="roles" role="tablist">
-        <button type="button" class="role active" data-role="md">Managing<br>Director</button>
-        <button type="button" class="role" data-role="manager">Inventory<br>Manager</button>
-        <button type="button" class="role" data-role="employee">Employee</button>
+      <div class="autologin" id="autologin">
+        <button type="button" class="auto-btn" data-role="md" data-icon="👔"><span class="ic">👔</span><span><b>Managing Director</b><small>Full access, reports, vendors, users</small></span><i>→</i></button>
+        <button type="button" class="auto-btn" data-role="manager" data-icon="📦"><span class="ic">📦</span><span><b>Inventory Manager</b><small>Manage stock, vendors and sales</small></span><i>→</i></button>
+        <button type="button" class="auto-btn" data-role="employee" data-icon="🧾"><span class="ic">🧾</span><span><b>Employee</b><small>Record sales and view stock</small></span><i>→</i></button>
       </div>
-
-      <form id="loginForm" autocomplete="off">
-        <label class="fld"><span>Username</span><input id="username" required autofocus></label>
-        <label class="fld"><span>Password</span>
-          <div class="pw"><input id="password" type="password" required><button type="button" id="showpw" class="link">Show</button></div>
-        </label>
-        <div id="err" class="form-error" role="alert" hidden></div>
-        <button class="btn primary block" type="submit">Sign in</button>
-      </form>
-
-      <div class="hint">
-        <b>First-time logins</b> (change them in Users after signing in)<br>
-        director / director123 &nbsp;·&nbsp; manager / manager123 &nbsp;·&nbsp; employee / employee123
-      </div>
+      <p class="tip"><span class="tip-arrow">➜</span> Tap a role, or swipe it to the right. Keys 1, 2, 3 also work.</p>
+      <div id="err" class="form-error" role="alert" hidden></div>
     </section>
   </main>
 
@@ -54,6 +69,7 @@
   <script src="js/categories.js"></script>
   <script src="js/demo.js"></script>
   <script src="js/auth.js"></script>
+  <script src="js/fx.js"></script>
   <script src="js/login.js"></script>
 </body>
 </html>

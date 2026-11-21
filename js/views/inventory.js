@@ -187,11 +187,11 @@ const InventoryView = {
             '<div class="actions">' + buttons(p) + '</div></div></article>';
         }).join('') + '</div>';
       } else {
-        list.innerHTML = '<div class="table-wrap"><table><thead><tr><th>Product</th><th>Category</th>' + (cost ? '<th class="num">Cost</th>' : '') + '<th class="num">Price</th><th class="num">In stock</th><th>Status</th><th></th></tr></thead><tbody>' +
+        list.innerHTML = '<div class="table-wrap"><table><thead><tr><th>Product</th><th class="hm">Category</th>' + (cost ? '<th class="num hm">Cost</th>' : '') + '<th class="num">Price</th><th class="num">In stock</th><th>Status</th><th></th></tr></thead><tbody>' +
           rows.map(p => {
             const c = CATEGORIES[p.category];
             return '<tr class="clickrow" data-id="' + p.id + '"><td><div class="rowprod">' + UI.thumb(p, 'thumb') + '<div><b>' + UI.esc(p.name) + '</b><small>' + UI.esc(p.code) + '</small></div></div></td>' +
-              '<td>' + UI.esc(c.label) + '</td>' + (cost ? '<td class="num">' + UI.inr(p.cost) + '</td>' : '') +
+              '<td class="hm">' + UI.esc(c.label) + '</td>' + (cost ? '<td class="num hm">' + UI.inr(p.cost) + '</td>' : '') +
               '<td class="num">' + UI.inr(p.price) + '</td><td class="num"><span class="qty">' + p.qty + '</span></td><td>' + UI.badge(Service.stockStatus(p)) + '</td>' +
               '<td><div class="actions">' + buttons(p) + '</div></td></tr>';
           }).join('') + '</tbody></table></div>';
