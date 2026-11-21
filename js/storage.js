@@ -55,9 +55,9 @@ const Store = {
       return;
     }
     /* older installs that only hold the small sample set get the full one once */
-    if (!this.get('demo2', false)) {
-      this.set('demo2', true);
-      if (this.products().every(p => p.demo)) Demo.load();
+    if (!this.get('demo3', false)) {
+      this.set('demo3', true);
+      if (this.products().every(p => p.demo) && this.sales().every(x => String(x.id).startsWith('sdemo'))) Demo.load();
     }
   }
 };

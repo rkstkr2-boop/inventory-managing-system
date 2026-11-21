@@ -51,6 +51,21 @@ const Demo = {
     return 'data:image/svg+xml,' + encodeURIComponent(svg);
   },
 
+  /* ---------- sample payment screenshots (drawn, not real) ---------- */
+  proofArt(mode, total, when, txn) {
+    const col = { 'UPI': '#16a34a', 'Card': '#2563eb', 'EMI / Finance': '#7c3aed', 'Bank Transfer': '#ea580c' }[mode] || '#16a34a';
+    const amt = '₹' + Number(total).toLocaleString('en-IN');
+    const t = (y, s, sz, f, w, x) => '<text x="' + (x || 180) + '" y="' + y + '" text-anchor="' + (x ? 'start' : 'middle') + '" font-family="Arial,sans-serif" font-weight="' + (w || 400) + '" font-size="' + sz + '" fill="' + f + '">' + s + '</text>';
+    const row = (y, k, v) => t(y, k, 13, '#64748b', 400, 28) + '<text x="332" y="' + y + '" text-anchor="end" font-family="Arial,sans-serif" font-weight="700" font-size="13" fill="#0f172a">' + v + '</text><line x1="28" y1="' + (y + 12) + '" x2="332" y2="' + (y + 12) + '" stroke="#e2e8f0"/>';
+    const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 560"><rect width="360" height="560" fill="#f8fafc"/><rect width="360" height="190" fill="' + col + '"/>' +
+      '<circle cx="180" cy="62" r="30" fill="#fff"/><path d="M165 62 l10 11 l21 -23" fill="none" stroke="' + col + '" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>' +
+      t(122, 'Payment Successful', 19, '#fff', 700) + t(160, amt, 34, '#fff', 800) +
+      '<rect x="14" y="205" width="332" height="270" rx="16" fill="#fff" stroke="#e2e8f0"/>' +
+      row(240, 'Paid to', 'Mobile Shop') + row(276, 'Payment mode', mode) + row(312, 'Date and time', when) + row(348, 'Transaction ID', txn) + row(384, 'Status', 'Completed') +
+      t(425, 'Thank you for shopping with us', 12, '#94a3b8') + t(520, 'Sample screenshot (demo data)', 11, '#94a3b8') + '</svg>';
+    return 'data:image/svg+xml,' + encodeURIComponent(svg);
+  },
+
   /* ---------- vendors (names, numbers and GST numbers are made up) ---------- */
   VENDORS: [
     { name: 'Sharma Mobile Distributors', contact: 'Rajesh Sharma', phone: '+91 98100 12345', email: 'orders@sharmamobiles.example', address: 'Nehru Place, New Delhi 110019', gstin: '07AAAPS1234A1Z5', terms: '15 days credit', notes: 'Apple and Samsung phones. Best rates on bulk orders.' },
@@ -169,7 +184,8 @@ const Demo = {
         qty: r.qty, price: r.p.price, discount: r.disc, total, cost: r.p.cost, profit: total - r.p.cost * r.qty, payment: r.pay,
         customer: r.named ? pick(this.CUSTOMERS) : '', phone: r.named ? '9' + ri(100000000, 999999999) : '',
         imei: r.p.category === 'phone' ? '35' + String(ri(1000000, 9999999)) + String(ri(100000, 999999)).slice(0, 6) : '',
-        note: rnd() < 0.15 ? pick(this.NOTES) : '', soldBy: r.by.name, soldById: r.by.id, voided: false, _t: r.t };
+        note: rnd() < 0.15 ? pick(this.NOTES) : '', soldBy: r.by.name, soldById: r.by.id, voided: false, _t: r.t,
+        proof: r.pay === 'Cash' ? '' : this.proofArt(r.pay, total, new Date(r.t).toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }), String(ri(100000000, 999999999)) + String(ri(100, 999))) };
       if (voided) { s.voided = true; s.voidReason = 'Customer changed mind'; s.voidedBy = staff.md.name; }
       return s;
     });
@@ -212,6 +228,6 @@ const Demo = {
     Store.saveSales(sales.reverse());
     Store.saveLogs(logs);
     Store.set('counters', counters);
-    Store.set('demo2', true);
+    Store.set('demo2', true); Store.set('demo3', true);
   }
 };

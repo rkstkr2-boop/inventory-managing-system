@@ -31,10 +31,10 @@ const UI = {
     setTimeout(() => t.remove(), 3500);
   },
 
-  modal(title, html, wide) {
+  modal(title, html, wide, center) {
     const root = document.createElement('div');
-    root.className = 'overlay';
-    root.innerHTML = '<div class="modal' + (wide ? ' wide' : '') + '" role="dialog" aria-modal="true">' +
+    root.className = 'overlay' + (center ? ' center' : '');
+    root.innerHTML = '<div class="modal' + (wide ? ' wide' : '') + (center ? ' center' : '') + '" role="dialog" aria-modal="true">' +
       '<div class="modal-h"><h3>' + UI.esc(title) + '</h3><button class="icon-btn" data-close aria-label="Close">✕</button></div>' +
       '<div class="modal-b">' + html + '</div></div>';
     document.body.appendChild(root);
@@ -68,6 +68,15 @@ const UI = {
     return '<span class="badge ' + map[status][1] + '">' + map[status][0] + '</span>';
   },
 
+  /* full-screen view of an image; tap anywhere to close */
+  lightbox(src) {
+    const d = document.createElement('div');
+    d.className = 'lightbox';
+    d.innerHTML = '<img src="' + src + '" alt="Payment screenshot">';
+    d.onclick = () => d.remove();
+    document.body.appendChild(d);
+  },
+
   /* suggestion list of saved vendors for the "bought from" boxes */
   vendorList() {
     return '<datalist id="vlist">' + Store.vendors().map(v => '<option value="' + UI.esc(v.name) + '">').join('') + '</datalist>';
@@ -80,7 +89,7 @@ const UI = {
   },
 
   /* shrink a chosen photo so many products fit in browser storage */
-  readPhoto(file) {
+  readPhoto(file, max, quality) {
     return new Promise((res, rej) => {
       if (!file || !file.type.startsWith('image/')) return rej(new Error('Please choose an image file.'));
       const r = new FileReader();
@@ -89,12 +98,12 @@ const UI = {
         const img = new Image();
         img.onerror = () => rej(new Error('Could not read that image.'));
         img.onload = () => {
-          const s = Math.min(1, 520 / Math.max(img.width, img.height));
+          const s = Math.min(1, (max || 520) / Math.max(img.width, img.height));
           const c = document.createElement('canvas');
           c.width = Math.round(img.width * s); c.height = Math.round(img.height * s);
           const x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height);
           x.drawImage(img, 0, 0, c.width, c.height);
-          res(c.toDataURL('image/jpeg', 0.78));
+          res(c.toDataURL('image/jpeg', quality || 0.78));
         };
         img.src = r.result;
       };

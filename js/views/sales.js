@@ -18,6 +18,8 @@ const SalesView = {
         '<label class="fld"><span>Customer phone</span><input id="scp" inputmode="tel" maxlength="15"></label>' +
         '<label class="fld full" id="imeiwrap" hidden><span>Phone IMEI / serial number</span><input id="simei" placeholder="15-digit IMEI of the phone sold"></label>' +
         '<label class="fld full"><span>Notes (how it was sold, offers, exchange...)</span><input id="sn"></label>' +
+        '<div class="fld full"><span>Payment screenshot (optional)</span><div class="proof-row"><label class="proof-pick" id="ppick"><div id="pbox"></div><input type="file" id="pfile" accept="image/*" hidden></label>' +
+          '<div><small class="muted">UPI, card or bank transfer proof. Tap to take a photo or choose one.</small><br><button type="button" class="btn sm" id="prm" hidden>Remove screenshot</button></div></div></div>' +
       '</div>' +
       '<div class="summary"><div><span>Total to collect</span><b class="big" id="tot">₹0</b></div><div><span>Stock after this sale</span><b id="aft">-</b></div></div>' +
       '<div id="serr" class="form-error" hidden></div>' +
@@ -36,6 +38,12 @@ const SalesView = {
     [q, pr, d].forEach(i => i.oninput = calc);
     if (preId) sel.onchange(); else calc();
     m.$('[data-x]').onclick = m.close;
+    let proof = '';
+    const drawProof = () => { m.$('#pbox').innerHTML = proof ? '<img src="' + proof + '" alt="Payment screenshot">' : '<span>📎<br>Add<br>screenshot</span>'; m.$('#prm').hidden = !proof; };
+    drawProof();
+    m.$('#ppick').onclick = () => m.$('#pfile').click();
+    m.$('#prm').onclick = () => { proof = ''; drawProof(); };
+    m.$('#pfile').onchange = async e => { try { proof = await UI.readPhoto(e.target.files[0], 1000, 0.8); drawProof(); } catch (err) { UI.toast(err.message, 'err'); } };
 
     m.$('#sf').addEventListener('submit', e => {
       e.preventDefault();
@@ -43,26 +51,69 @@ const SalesView = {
         const sale = Service.recordSale({
           pid: sel.value, qty: parseInt(q.value, 10), price: Number(pr.value), discount: Number(d.value) || 0,
           payment: m.$('#spay').value, customer: m.$('#scn').value.trim(), phone: m.$('#scp').value.trim(),
-          imei: m.$('#simei').value.trim(), note: m.$('#sn').value.trim()
+          imei: m.$('#simei').value.trim(), note: m.$('#sn').value.trim(), proof
         }, App.user);
         m.close();
         const left = Store.products().find(x => x.id === sale.pid).qty;
         UI.toast('Sale recorded (' + sale.receipt + '). ' + left + ' left in stock.');
         FX.confetti();
+        if (sale.proofDropped) UI.toast('Sale saved, but the screenshot was too large for storage.', 'err');
         done && done();
       } catch (err) { const b = m.$('#serr'); b.textContent = err.message; b.hidden = false; }
     });
   },
 
+  /* centered preview with every detail of one sale + payment screenshot */
   openDetails(id) {
     const s = Store.sales().find(x => x.id === id);
-    const row = (a, b) => b ? '<div><span class="muted">' + a + '</span><b>' + UI.esc(b) + '</b></div>' : '';
-    UI.modal('Sale ' + s.receipt, '<div class="summary">' +
-      row('Product', s.name) + row('Date', UI.dt(s.date)) + row('Quantity', s.qty) + row('Price each', UI.inr(s.price)) +
-      row('Discount', s.discount ? UI.inr(s.discount) : '') + row('Total', UI.inr(s.total)) + row('Payment', s.payment) +
-      row('Customer', s.customer) + row('Phone', s.phone) + row('IMEI', s.imei) + row('Notes', s.note) + row('Sold by', s.soldBy) +
-      (Auth.can('cost.view') ? row('Profit', UI.inr(s.profit)) : '') +
-      (s.voided ? row('CANCELLED', s.voidedBy + (s.voidReason ? ' - ' + s.voidReason : '')) : '') + '</div>');
+    if (!s) return;
+    const p = Store.products().find(x => x.id === s.pid);
+    const cat = CATEGORIES[s.category] || CATEGORIES.other;
+    const cell = (label, val, html) => (val === '' || val == null) ? '' : '<div><span>' + label + '</span><b>' + (html || UI.esc(val)) + '</b></div>';
+    const thumb = p ? UI.thumb(p, 'thumb') : '<span class="thumb ph">' + cat.icon + '</span>';
+    const canCost = Auth.can('cost.view');
+    const status = s.voided ? '<span class="badge gray">Cancelled</span>' : '<span class="badge ok">Paid</span>';
+
+    const m = UI.modal('Sale details', '<div class="sd-head"><div><div class="sd-receipt">' + UI.esc(s.receipt) + '</div><div class="muted">' + UI.dt(s.date) + '</div></div>' + status + '</div>' +
+      '<div class="sd-prod">' + thumb + '<div class="grow"><b>' + UI.esc(s.name) + '</b><small class="muted" style="display:block">' + UI.esc(s.code) + ' · ' + UI.esc(cat.label) + '</small></div><div class="sd-qty">× ' + s.qty + '</div></div>' +
+      '<div class="summary">' +
+        '<div><span>Price each</span><b>' + UI.inr(s.price) + '</b></div>' +
+        '<div><span>Quantity</span><b>' + s.qty + '</b></div>' +
+        '<div><span>Discount</span><b>' + (s.discount ? '- ' + UI.inr(s.discount) : 'None') + '</b></div>' +
+        '<div><span>Total paid</span><b class="big">' + UI.inr(s.total) + '</b></div>' +
+        (canCost ? '<div><span>Profit on this sale</span><b>' + UI.inr(s.profit) + '</b></div>' : '') + '</div>' +
+      '<div class="sd-grid">' + cell('Payment mode', s.payment) + cell('Sold by', s.soldBy) + cell('Customer', s.customer) +
+        cell('Customer phone', s.phone, s.phone ? '<a class="link" href="tel:' + UI.esc(s.phone) + '">' + UI.esc(s.phone) + ' 📞</a>' : '') +
+        cell('Phone IMEI', s.imei) + cell('Notes', s.note) + '</div>' +
+      (s.voided ? '<div class="form-error" style="margin-top:12px"><b>Cancelled</b> by ' + UI.esc(s.voidedBy || '') + (s.voidReason ? ': ' + UI.esc(s.voidReason) : '') + '. Stock was put back.</div>' : '') +
+      '<div class="section-title">Payment screenshot</div><div class="sd-proof" id="proofbox"></div>' +
+      '<input type="file" id="pfile" accept="image/*" hidden>' +
+      '<div class="form-actions"><button class="btn" data-a="close">Close</button></div>', false, true);
+
+    const box = m.$('#proofbox'), file = m.$('#pfile');
+    const drawProof = () => {
+      const cur = Store.sales().find(x => x.id === id);
+      box.innerHTML = cur.proof
+        ? '<img src="' + cur.proof + '" alt="Payment screenshot"><div class="proof-actions"><button class="btn sm" data-a="zoom">🔍 View full screen</button>' +
+          '<a class="btn sm" href="' + cur.proof + '" download="' + UI.esc(cur.receipt) + '-payment.jpg">⬇ Download</a>' +
+          '<button class="btn sm" data-a="add">Replace</button>' + (Auth.can('sales.void') ? '<button class="btn sm" data-a="rm">Remove</button>' : '') + '</div>'
+        : '<div class="proof-empty">No payment screenshot added yet.<br><button class="btn primary sm" data-a="add" style="margin-top:10px">📎 Add payment screenshot</button></div>';
+    };
+    drawProof();
+    m.root.addEventListener('click', e => {
+      const b = e.target.closest('[data-a]'); if (!b) return;
+      const a = b.dataset.a;
+      if (a === 'close') m.close();
+      if (a === 'add') file.click();
+      if (a === 'zoom') UI.lightbox(Store.sales().find(x => x.id === id).proof);
+      if (a === 'rm') { Service.setProof(id, ''); drawProof(); App.render(); UI.toast('Screenshot removed'); }
+    });
+    box.addEventListener('click', e => { if (e.target.tagName === 'IMG') UI.lightbox(e.target.src); });
+    file.onchange = async e => {
+      try { Service.setProof(id, await UI.readPhoto(e.target.files[0], 1000, 0.8)); drawProof(); App.render(); UI.toast('Payment screenshot saved'); }
+      catch (err) { UI.toast(err.message, 'err'); }
+      file.value = '';
+    };
   },
 
   render(el) {
@@ -88,7 +139,7 @@ const SalesView = {
       const list = el.querySelector('#list');
       if (!rows.length) { list.innerHTML = '<div class="empty">No sales in this period.</div>'; return; }
       list.innerHTML = '<table><thead><tr><th>Receipt</th><th>Product</th><th class="num">Qty</th><th class="num">Total</th><th class="hm">Payment</th><th class="hm">Customer</th><th class="hm">Sold by</th><th></th></tr></thead><tbody>' +
-        rows.map(s => '<tr class="' + (s.voided ? 'void' : '') + '"><td><b>' + s.receipt + '</b><small>' + UI.dt(s.date) + '</small></td><td>' + UI.esc(s.name) + (s.imei ? '<small>IMEI ' + UI.esc(s.imei) + '</small>' : '') + '</td>' +
+        rows.map(s => '<tr class="' + (s.voided ? 'void' : '') + '"><td><b>' + s.receipt + '</b><small>' + UI.dt(s.date) + '</small></td><td>' + UI.esc(s.name) + (s.proof ? ' <span title="Payment screenshot attached">📎</span>' : '') + (s.imei ? '<small>IMEI ' + UI.esc(s.imei) + '</small>' : '') + '</td>' +
           '<td class="num">' + s.qty + '</td><td class="num"><b>' + UI.inr(s.total) + '</b></td><td class="hm">' + UI.esc(s.payment) + '</td><td class="hm">' + UI.esc(s.customer || '-') + '</td><td class="hm">' + UI.esc(s.soldBy) + '</td>' +
           '<td><div class="actions"><button class="btn sm" data-a="view" data-id="' + s.id + '">Details</button>' +
           (Auth.can('sales.void') && !s.voided ? '<button class="btn sm" data-a="void" data-id="' + s.id + '">Cancel</button>' : '') +

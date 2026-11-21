@@ -99,8 +99,6 @@ const Service = {
     if (s.qty > p.qty) throw new Error('Only ' + p.qty + ' in stock.');
     if (s.discount > s.price * s.qty) throw new Error('Discount is more than the sale amount.');
     const before = p.qty;
-    p.qty -= s.qty;
-    Store.saveProducts(products);
 
     const total = s.price * s.qty - s.discount;
     const sale = {
@@ -108,13 +106,33 @@ const Service = {
       date: new Date().toISOString(), pid: p.id, code: p.code, name: p.name, category: p.category,
       qty: s.qty, price: s.price, discount: s.discount, total, cost: p.cost,
       profit: total - p.cost * s.qty, payment: s.payment, customer: s.customer, phone: s.phone,
-      imei: s.imei, note: s.note, soldBy: user.name, soldById: user.id, voided: false
+      imei: s.imei, note: s.note, proof: s.proof || '', soldBy: user.name, soldById: user.id, voided: false
     };
     const sales = Store.sales();
     sales.unshift(sale);
-    Store.saveSales(sales);
+    /* save the sale first, so stock is only reduced once the sale is safely stored */
+    const full = 'Browser storage is full. Download a backup and clear old data, then try again.';
+    try { Store.saveSales(sales); }
+    catch (e) {
+      if (!sale.proof) throw new Error(full);
+      sale.proof = ''; sale.proofDropped = true;      // screenshot too big: keep the sale without it
+      try { Store.saveSales(sales); } catch (e2) { throw new Error(full); }
+    }
+    p.qty -= s.qty;
+    Store.saveProducts(products);
     this._log(p, 'sale', -s.qty, before, p.qty, 'Sold ' + sale.receipt, user, sale.receipt);
     return sale;
+  },
+
+  /* add, replace or remove the payment screenshot of an existing sale */
+  setProof(id, proof) {
+    const sales = Store.sales();
+    const s = sales.find(x => x.id === id);
+    if (!s) throw new Error('Sale not found');
+    const old = s.proof;
+    s.proof = proof || '';
+    try { Store.saveSales(sales); }
+    catch (e) { s.proof = old; throw new Error('Browser storage is full. Remove some photos or download a backup first.'); }
   },
 
   /* Cancel a sale (wrong entry / return): puts stock back */
