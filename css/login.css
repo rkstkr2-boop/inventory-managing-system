@@ -1,0 +1,23 @@
+/* login.css - sign-in page only */
+.login-body { min-height: 100vh; background: linear-gradient(135deg, #312e81, #4f46e5 55%, #6366f1); display: grid; place-items: center; padding: 20px; }
+.login-wrap { display: grid; grid-template-columns: 1.1fr 1fr; width: 100%; max-width: 920px; background: #fff; border-radius: 20px; overflow: hidden; box-shadow: 0 30px 70px rgba(0,0,0,.35); }
+.login-brand { background: #111827; color: #cbd5e1; padding: 44px 38px; }
+.login-brand .logo { width: 56px; height: 56px; border-radius: 16px; background: var(--primary); display: grid; place-items: center; font-size: 28px; margin-bottom: 22px; }
+.login-brand h1 { color: #fff; font-size: 30px; margin-bottom: 14px; }
+.login-brand ul { padding-left: 18px; margin: 22px 0 0; display: grid; gap: 8px; }
+.login-card { padding: 40px 36px; }
+.login-card h2 { font-size: 24px; margin-bottom: 4px; }
+.login-card .muted { margin: 0 0 20px; }
+.roles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 20px; }
+.role { border: 1.5px solid var(--line); background: #fff; border-radius: 10px; padding: 10px 6px; font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; color: #475569; }
+.role.active { border-color: var(--primary); background: var(--primary-l); color: var(--primary-d); }
+.pw { position: relative; }
+.pw input { padding-right: 60px; }
+.pw .link { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); font-size: 13px; font-weight: 600; }
+.hint { margin-top: 20px; font-size: 12.5px; color: var(--muted); background: #f8fafc; border-radius: 10px; padding: 12px; line-height: 1.7; }
+@media (max-width: 760px) {
+  .login-wrap { grid-template-columns: 1fr; }
+  .login-brand { padding: 26px; } .login-brand ul { display: none; }
+  .login-brand h1 { font-size: 22px; } .login-brand h1 br { display: none; }
+  .login-card { padding: 26px 22px; }
+}

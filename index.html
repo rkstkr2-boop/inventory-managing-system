@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sign in - Mobile Shop Inventory</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/login.css">
+  <link rel="stylesheet" href="css/anim.css">
+</head>
+<body class="login-body">
+  <i class="blob" style="width:160px;height:160px;left:6%;top:12%"></i>
+  <i class="blob" style="width:90px;height:90px;right:10%;top:20%;animation-delay:-2s"></i>
+  <i class="blob" style="width:220px;height:220px;right:4%;bottom:6%;animation-delay:-4s"></i>
+  <main class="login-wrap">
+    <section class="login-brand">
+      <div class="logo">📱</div>
+      <h1>Mobile Shop<br>Inventory</h1>
+      <p>Track phones, batteries, watches, covers and more. Every sale updates your stock instantly.</p>
+      <ul>
+        <li>Live stock count after every sale</li>
+        <li>Full record of who sold what, and for how much</li>
+        <li>Low-stock alerts so you never run out</li>
+      </ul>
+    </section>
+
+    <section class="login-card">
+      <h2>Welcome back</h2>
+      <p class="muted">Choose your role and sign in</p>
+
+      <div class="roles" id="roles" role="tablist">
+        <button type="button" class="role active" data-role="md">Managing<br>Director</button>
+        <button type="button" class="role" data-role="manager">Inventory<br>Manager</button>
+        <button type="button" class="role" data-role="employee">Employee</button>
+      </div>
+
+      <form id="loginForm" autocomplete="off">
+        <label class="fld"><span>Username</span><input id="username" required autofocus></label>
+        <label class="fld"><span>Password</span>
+          <div class="pw"><input id="password" type="password" required><button type="button" id="showpw" class="link">Show</button></div>
+        </label>
+        <div id="err" class="form-error" role="alert" hidden></div>
+        <button class="btn primary block" type="submit">Sign in</button>
+      </form>
+
+      <div class="hint">
+        <b>First-time logins</b> (change them in Users after signing in)<br>
+        director / director123 &nbsp;·&nbsp; manager / manager123 &nbsp;·&nbsp; employee / employee123
+      </div>
+    </section>
+  </main>
+
+  <script src="js/storage.js"></script>
+  <script src="js/categories.js"></script>
+  <script src="js/demo.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/login.js"></script>
+</body>
+</html>
